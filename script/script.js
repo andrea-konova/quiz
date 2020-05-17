@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function () {
       questions[index].answers.forEach((answer) => {
         const answerItem = document.createElement('div');
 
-        answerItem.classList.add('answers-item', 'd-flex', 'flex-column');
+        answerItem.classList.add('answers-item', 'd-flex', 'justify-content-center');
 
         answerItem.innerHTML = `
           <input type="${questions[index].type}" id="${answer.title}" name="answer" class="d-none" value="${answer.title}">
@@ -149,6 +149,13 @@ document.addEventListener('DOMContentLoaded', function () {
           </div>
         `;
       }
+
+      if (numberQuestion === questions.length) {
+        formAnswers.textContent = 'Спасибо, наш менеджер свяжется с вами в течении 5 минут.';
+        setTimeout(() => {
+          modalBlock.classList.remove('d-block');
+        }, 2000);
+      }
     }
 
     // запуск функции рендеринга
@@ -157,14 +164,20 @@ document.addEventListener('DOMContentLoaded', function () {
     const checkAnswer = () => {
       const obj = {};
 
-      const inputs = [...formAnswers.elements].filter((input) => input.checked);
+      const inputs = [...formAnswers.elements].filter((input) => input.checked || input.id === "numberPhone");
 
       inputs.forEach((input, index) => {
-        obj[`${index}_${questions[numberQuestion].question}`] = input.value;
+        if (numberQuestion >= 0 && numberQuestion <= questions.length - 1) {
+          obj[`${index}_${questions[numberQuestion].question}`] = input.value;
+        }
+
+        if (numberQuestion === questions.length) {
+          obj['Номер телефона'] = input.value;
+        }
+
       })
 
       finalAnswers.push(obj);
-      console.log(finalAnswers);
     }
 
     // обработчики событий кнопок next и prev 
@@ -181,7 +194,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     sendButton.onclick = () => {
       checkAnswer();
-      console.log(finalAnswers);
+      numberQuestion++;
+      renderQuestion(numberQuestion);
     }
   }
 
