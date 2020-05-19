@@ -9,86 +9,36 @@ document.addEventListener('DOMContentLoaded', function () {
   const nextButton = document.querySelector('#next');
   const sendButton = document.querySelector('#send');
 
-  // объект, содержащий вопросы и ответы
-  const questions = [
-    {
-      question: "Какого цвета бургер?",
-      answers: [
-          {
-              title: 'Стандарт',
-              url: './image/burger.png'
-          },
-          {
-              title: 'Черный',
-              url: './image/burgerBlack.png'
-          }
-      ],
-      type: 'radio'
-    },
-    {
-        question: "Из какого мяса котлета?",
-        answers: [
-            {
-                title: 'Курица',
-                url: './image/chickenMeat.png'
-            },
-            {
-                title: 'Говядина',
-                url: './image/beefMeat.png'
-            },
-            {
-                title: 'Свинина',
-                url: './image/porkMeat.png'
-            }
-        ],
-        type: 'radio'
-    },
-    {
-        question: "Дополнительные ингредиенты?",
-        answers: [
-            {
-                title: 'Помидор',
-                url: './image/tomato.png'
-            },
-            {
-                title: 'Огурец',
-                url: './image/cucumber.png'
-            },
-            {
-                title: 'Салат',
-                url: './image/salad.png'
-            },
-            {
-                title: 'Лук',
-                url: './image/onion.png'
-            }
-        ],
-        type: 'checkbox'
-    },
-    {
-        question: "Добавить соус?",
-        answers: [
-            {
-                title: 'Чесночный',
-                url: './image/sauce1.png'
-            },
-            {
-                title: 'Томатный',
-                url: './image/sauce2.png'
-            },
-            {
-                title: 'Горчичный',
-                url: './image/sauce3.png'
-            }
-        ],
-        type: 'radio'
-    }
-  ]
+  const firebaseConfig = {
+    apiKey: "AIzaSyBy_tFQSKX1S8gFaBuiu4EDx-02W9NYkTA",
+    authDomain: "burger-quiz-3844a.firebaseapp.com",
+    databaseURL: "https://burger-quiz-3844a.firebaseio.com",
+    projectId: "burger-quiz-3844a",
+    storageBucket: "burger-quiz-3844a.appspot.com",
+    messagingSenderId: "530828408879",
+    appId: "1:530828408879:web:eecc8573cfa7cd2fd36eda",
+    measurementId: "G-02SX374VPM"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+
+  // функция получения данных
+  const getData = () => {
+    formAnswers.textContent = 'LOAD';
+
+    prevButton.classList.add('d-none');
+    sendButton.classList.add('d-none');
+
+    setTimeout(() => {
+      firebase.database().ref().child('questions').once('value')
+      .then(snap => playTest(snap.val()))
+    }, 500)
+  }
 
   // обработчики события открытия/закрытия модального окна
   btnOpenModal.addEventListener('click', () => {
       modalBlock.classList.add('d-block');
-      playTest();
+      getData();
   })
 
   closeModal.addEventListener('click', () => {
@@ -96,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
   })
 
   // функция запуска тестирования
-  const playTest = () => {
+  const playTest = (questions) => {
 
     const finalAnswers = [];
 
@@ -150,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
       }
 
-      if (numberQuestion === questions.length) {
+      if (numberQuestion === questions.length + 1) {
         formAnswers.textContent = 'Спасибо, наш менеджер свяжется с вами в течении 5 минут.';
         setTimeout(() => {
           modalBlock.classList.remove('d-block');
@@ -176,7 +126,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
       })
-
       finalAnswers.push(obj);
     }
 
@@ -196,6 +145,12 @@ document.addEventListener('DOMContentLoaded', function () {
       checkAnswer();
       numberQuestion++;
       renderQuestion(numberQuestion);
+      firebase
+      .database()
+      .ref()
+      .child('contacts')
+      .push(finalAnswers)
+      console.log(finalAnswers);
     }
   }
 
