@@ -5,9 +5,34 @@ document.addEventListener('DOMContentLoaded', function () {
   const closeModal = document.querySelector('#closeModal');
   const questionTitle = document.querySelector('#question');
   const formAnswers = document.querySelector('#formAnswers');
+  const burgerBtn = document.getElementById('burger');
   const prevButton = document.querySelector('#prev');
   const nextButton = document.querySelector('#next');
   const sendButton = document.querySelector('#send');
+
+  let clientWidth = document.documentElement.clientWidth;
+
+  if (clientWidth < 768) {
+    burgerBtn.style.display = "flex";
+  } else {
+    burgerBtn.style.display = "none";
+  }
+
+  window.addEventListener('resize', function () {
+    clientWidth = document.documentElement.clientWidth;
+
+    if (clientWidth < 768) {
+      burgerBtn.style.display = "flex";
+    } else {
+      burgerBtn.style.display = "none";
+    }
+  });
+
+  burgerBtn.addEventListener('click', function () {
+    burgerBtn.classList.add('active');
+    modalBlock.classList.add('d-block');
+    getData();
+  });
 
   const firebaseConfig = {
     apiKey: "AIzaSyBy_tFQSKX1S8gFaBuiu4EDx-02W9NYkTA",
