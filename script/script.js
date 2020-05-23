@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const prevButton = document.querySelector('#prev');
   const nextButton = document.querySelector('#next');
   const sendButton = document.querySelector('#send');
+  const modalDialog = document.querySelector('.modal-dialog');
 
   let clientWidth = document.documentElement.clientWidth;
 
@@ -29,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   burgerBtn.addEventListener('click', function () {
-    burgerBtn.classList.add('active');
+    burgerBtn.classList.add("active");
     modalBlock.classList.add('d-block');
     getData();
   });
@@ -47,6 +48,19 @@ document.addEventListener('DOMContentLoaded', function () {
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
 
+  let count = -100;
+
+  const animateModal = () => {
+    modalDialog.style.top = count + "%";
+    count += 3;
+
+    if (count < 0) {
+      requestAnimationFrame(animateModal);
+    } else {
+      count = -100;
+    }
+  };
+
   // функция получения данных
   const getData = () => {
     formAnswers.textContent = 'LOAD';
@@ -62,12 +76,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // обработчики события открытия/закрытия модального окна
   btnOpenModal.addEventListener('click', () => {
+      requestAnimationFrame(animateModal);
       modalBlock.classList.add('d-block');
       getData();
   })
 
   closeModal.addEventListener('click', () => {
       modalBlock.classList.remove('d-block');
+      burgerBtn.classList.remove("active");
   })
 
   // функция запуска тестирования
