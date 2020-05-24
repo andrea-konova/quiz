@@ -10,7 +10,9 @@ document.addEventListener('DOMContentLoaded', function () {
   const nextButton = document.querySelector('#next');
   const sendButton = document.querySelector('#send');
   const modalDialog = document.querySelector('.modal-dialog');
+  const modalTitle = document.querySelector('.modal-title');
 
+  // burger-menu
   let clientWidth = document.documentElement.clientWidth;
 
   if (clientWidth < 768) {
@@ -35,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
     getData();
   });
 
+  // База данных firebase
   const firebaseConfig = {
     apiKey: "AIzaSyBy_tFQSKX1S8gFaBuiu4EDx-02W9NYkTA",
     authDomain: "burger-quiz-3844a.firebaseapp.com",
@@ -63,7 +66,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // функция получения данных
   const getData = () => {
-    formAnswers.textContent = 'LOAD';
+    // formAnswers.textContent = 'LOAD';
+    formAnswers.innerHTML = `
+    <div class="loader">
+      <img src="image/spinner.svg" alt="LOAD">
+    </div>
+  `;
 
     prevButton.classList.add('d-none');
     sendButton.classList.add('d-none');
@@ -90,9 +98,11 @@ document.addEventListener('DOMContentLoaded', function () {
   const playTest = (questions) => {
 
     const finalAnswers = [];
+    const obj = {};
 
     // переменная с номером вопроса
     let numberQuestion = 0;
+    modalTitle.textContent = 'Ответь на вопрос';
 
     // функция рендеринга ответов
     const renderAnswers = (index) => {
@@ -129,20 +139,36 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       if (numberQuestion === questions.length) {
+        questionTitle.textContent = '';
+        modalTitle.textContent = '';
+
         nextButton.classList.add('d-none');
         prevButton.classList.add('d-none');
         sendButton.classList.remove('d-none');
 
         formAnswers.innerHTML = `
           <div class="form-group">
-            <label for="numberPhone">Enter your number</label>
+            <label for="numberPhone">Введите свой номер телефона</label>
             <input type="phone" class="form-control" id="numberPhone">
           </div>
         `;
+
+        const numberPhone = document.getElementById('numberPhone');
+        numberPhone.addEventListener('input', (event) => {
+          event.target.value = event.target.value.replace(/[^0-9+-]/, '');
+        });
       }
 
       if (numberQuestion === questions.length + 1) {
         formAnswers.textContent = 'Спасибо, наш менеджер свяжется с вами в течении 5 минут.';
+        sendButton.classList.add('d-none');
+
+        for (let key in obj) {
+          let newObj = {};
+          newObj[key] = obj[key];
+          finalAnswers.push(newObj);
+        }
+        
         setTimeout(() => {
           modalBlock.classList.remove('d-block');
         }, 2000);
@@ -153,8 +179,7 @@ document.addEventListener('DOMContentLoaded', function () {
     renderQuestion(numberQuestion);
 
     const checkAnswer = () => {
-      const obj = {};
-
+ 
       const inputs = [...formAnswers.elements].filter((input) => input.checked || input.id === "numberPhone");
 
       inputs.forEach((input, index) => {
@@ -167,7 +192,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
       })
-      finalAnswers.push(obj);
     }
 
     // обработчики событий кнопок next и prev 
@@ -191,7 +215,6 @@ document.addEventListener('DOMContentLoaded', function () {
       .ref()
       .child('contacts')
       .push(finalAnswers)
-      console.log(finalAnswers);
     }
   }
 
